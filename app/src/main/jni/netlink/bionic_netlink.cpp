@@ -112,8 +112,14 @@ bool NetlinkConnection::SendRequest(int type) {
 bool NetlinkConnection::ReadResponses(void callback(void*, nlmsghdr*), void* out) {
   // Read through all the responses, handing interesting ones to the callback.
   ssize_t bytes_read;
+  // 自定义syscall
+//  while ((bytes_read = TEMP_FAILURE_RETRY(raw_syscall(__NR_recvfrom,fd_, data_, size_, 0, NULL,0))) > 0) {
 
-while ((bytes_read = TEMP_FAILURE_RETRY(raw_syscall(__NR_recvfrom,fd_, data_, size_, 0, NULL,0))) > 0) {
+  // 系统syscall
+  while ((bytes_read = TEMP_FAILURE_RETRY(syscall(__NR_recvfrom,fd_, data_, size_, 0, NULL,0))) > 0) {
+
+    // recvfrom
+//  while ((bytes_read = recvfrom(fd_, data_, size_, 0, NULL,0)) > 0) {
     auto* hdr = reinterpret_cast<nlmsghdr*>(data_);
 
     for (; NLMSG_OK(hdr, static_cast<size_t>(bytes_read)); hdr = NLMSG_NEXT(hdr, bytes_read)) {
